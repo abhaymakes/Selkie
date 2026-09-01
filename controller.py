@@ -172,23 +172,27 @@ def heartbeat():
     data = request.json
 
     id = data["beacon_id"]
-    timestamp = data['timestamp']
-    nonce = data['nonce']
-    signature = base64.b64decode(data['signature'])
+    timestamp = datetime.fromisoformat(data["timestamp"])
+    nonce = data["nonce"]
+    signature = base64.b64decode(data["signature"])
 
     with get_session() as session:
         beacon = session.get(Beacon, id)
         pub_key_hex = beacon.public_key
+
         try:
             pub_key_bytes = bytes.fromhex(pub_key_hex)
             pub_key = Ed25519PublicKey.from_public_bytes(pub_key_bytes)
 
-            pub_key.verify(signature, data['message'].encode('utf-8'))
-            print("success")
+            pub_key.verify(signature, data["message"].encode("utf-8"))
+            beacon.last_active = timestamp
+            session.add(beacon)
+            session.commit()
             return "200"
+
         except InvalidSignature:
             print("nope")
-            return {'error': 'Invalid signature'}
+            return {"error": "Invalid signature"}
 
 
 if __name__ == "__main__":
