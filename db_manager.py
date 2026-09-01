@@ -27,10 +27,11 @@ class Challenge(Base):
 
     challenge_id: Mapped[str] = mapped_column(String, primary_key=True)
     challenge: Mapped[str] = mapped_column(String)
+    type: Mapped[str] = mapped_column(String)
 
     beacon_id: Mapped[str] = mapped_column(String)
     public_key: Mapped[str] = mapped_column(String)
-    system_info: Mapped[dict] = mapped_column(JSON)
+    system_info: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime)
 

@@ -20,26 +20,67 @@ from db_manager import get_session, Beacon, Challenge
 
 app = Flask(__name__)
 
+NONCE_SET = {}
 
-def generate_new_challenge(beacon_fingerprint):
+def generate_new_challenge(
+    beacon_fingerprint=None,
+    beacon_id=None,
+    public_key=None,
+    challenge_type="registration",
+):
     challenge_id = str(uuid.uuid4())
     challenge = secrets.token_bytes(32)
     challenge_base64 = base64.b64encode(challenge).decode("utf-8")
 
     with get_session() as session:
-        challenge_generated = Challenge(
-            challenge_id=challenge_id,
-            challenge=challenge_base64,
-            beacon_id=beacon_fingerprint["beacon_id"],
-            public_key=beacon_fingerprint["public_key"],
-            system_info=beacon_fingerprint,
-            created_at=datetime.now(ZoneInfo("Asia/Kolkata")),
-        )
+
+        if beacon_fingerprint:
+            challenge_generated = Challenge(
+                challenge_id=challenge_id,
+                challenge=challenge_base64,
+                beacon_id=beacon_fingerprint["beacon_id"],
+                public_key=beacon_fingerprint["public_key"],
+                system_info=beacon_fingerprint,
+                created_at=datetime.now(ZoneInfo("Asia/Kolkata")),
+                type=challenge_type,
+            )
+
+        else:
+            challenge_generated = Challenge(
+                challenge_id=challenge_id,
+                challenge=challenge_base64,
+                beacon_id=beacon_id,
+                public_key=public_key,
+                created_at=datetime.now(ZoneInfo("Asia/Kolkata")),
+                type=challenge_type,
+            )
 
         session.add(challenge_generated)
         session.commit()
 
-    return {"challenge_id": challenge_id, "challenge": challenge_base64}
+    return {
+        "challenge_id": challenge_id,
+        "challenge": challenge_base64,
+    }
+
+
+@app.route("/api/register/verify", methods=["POST"])
+def verify_beacon():
+    beacon_id = request.json["beacon_id"]
+
+    with get_session() as session:
+        beacon = session.get(Beacon, beacon_id)
+
+        if beacon is None:
+            return {"registered": False}, 404
+
+        challenge_generated = generate_new_challenge(
+            beacon_id=beacon_id,
+            public_key=beacon.public_key,
+            challenge_type="authentication",
+        )
+
+    return challenge_generated, 200
 
 
 @app.route("/api/register/start", methods=["POST"])
@@ -48,7 +89,9 @@ def register_agent():
 
     beacon_fingerprint = request.json
 
-    challenge_generated = generate_new_challenge(beacon_fingerprint=beacon_fingerprint)
+    challenge_generated = generate_new_challenge(
+        beacon_fingerprint=beacon_fingerprint, challenge_type="registration"
+    )
 
     return challenge_generated, 200
 
@@ -70,36 +113,62 @@ def verify_challenge():
 
             beacon_id = challenge.beacon_id
             public_key_hex = challenge.public_key
-            system_info = challenge.system_info
             challenge_value = challenge.challenge
 
-            public_key_bytes = bytes.fromhex(public_key_hex)
-            public_key = Ed25519PublicKey.from_public_bytes(public_key_bytes)
-
-            public_key.verify(
-                base64.b64decode(challenge_signature), base64.b64decode(challenge_value)
+            public_key = Ed25519PublicKey.from_public_bytes(
+                bytes.fromhex(public_key_hex)
             )
 
-            challenge.used = True
+            public_key.verify(
+                base64.b64decode(challenge_signature),
+                base64.b64decode(challenge_value),
+            )
 
             current_timestamp = datetime.now(ZoneInfo("Asia/Kolkata"))
 
-            beacon = Beacon(
-                id=beacon_id,
-                public_key=public_key_hex,
-                system_info=json.dumps(system_info),
-                registered_at=current_timestamp,
-                last_active=current_timestamp,
-                status="online",
-            )
+            if challenge.type == "authentication":
 
-            session.add(beacon)
+                beacon = session.get(Beacon, beacon_id)
+
+                if beacon is None:
+                    return {"verified": False, "error": "Beacon not found"}, 404
+
+                beacon.last_active = current_timestamp
+                beacon.status = "online"
+
+            else:
+
+                existing_beacon = session.get(Beacon, beacon_id)
+
+                if existing_beacon:
+                    return {
+                        "verified": False,
+                        "error": "Beacon already registered",
+                    }, 409
+
+                beacon = Beacon(
+                    id=beacon_id,
+                    public_key=public_key_hex,
+                    system_info=json.dumps(challenge.system_info),
+                    registered_at=current_timestamp,
+                    last_active=current_timestamp,
+                    status="online",
+                )
+
+                session.add(beacon)
+
+            challenge.used = True
             session.commit()
 
         return {"verified": True}, 200
 
-    except (InvalidSignature, ValueError, TypeError, KeyError) as e:
+    except (InvalidSignature, ValueError, TypeError, KeyError):
         return {"verified": False}, 401
+
+
+@app.route("/api/heartbeat", methods=["POST"])
+def heartbeat():
+    pass
 
 
 if __name__ == "__main__":
