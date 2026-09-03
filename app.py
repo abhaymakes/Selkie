@@ -1,12 +1,14 @@
 from flask import Flask, render_template
 from dashboard import dashboard
+from task import task
 
 app = Flask(__name__)
 app.register_blueprint(dashboard)
+app.register_blueprint(task)
 
 
 @app.route("/", methods=["get", "post"])
-def dashboard():
+def home():
     return render_template("home.html")
 
 

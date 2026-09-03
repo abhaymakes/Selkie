@@ -13,11 +13,9 @@
     <style>
         body {
             background: #171614;
-            background-image: radial-gradient(
-                circle at 1px 1px,
-                #353129 1px,
-                transparent 0
-            );
+            background-image: radial-gradient(circle at 1px 1px,
+                    #353129 1px,
+                    transparent 0);
             background-size: 24px 24px;
 
             font-family: "Trebuchet MS", sans-serif;
@@ -117,25 +115,21 @@
 
     <!-- SIDEBAR -->
 
-    <aside
-        class="sidebar fixed inset-y-0 left-0
+    <aside class="sidebar fixed inset-y-0 left-0
                hidden lg:flex
                w-64
                p-6
-               flex-col"
-    >
+               flex-col">
 
         <!-- BRAND -->
 
         <a href="/" class="flex items-center gap-3">
 
-            <div
-                class="logo-box
+            <div class="logo-box
                        w-12 h-12
                        rounded-xl
                        flex items-center justify-center
-                       shrink-0"
-            >
+                       shrink-0">
                 <i class="ph-fill ph-fish-simple
                           text-2xl text-orange-600"></i>
             </div>
@@ -151,9 +145,7 @@
 
         <nav class="sidebar-nav mt-8 py-4">
 
-            <a
-                href="{{ url_for('dashboard.beacons') }}"
-                class="sidebar-link
+            <a href="{{ url_for('dashboard.beacons') }}" class="sidebar-link
                        rounded-lg
                        px-3 py-2.5
                        flex items-center gap-3
@@ -164,8 +156,7 @@
                            'dashboard.edit_beacon'
                        ] %}
                            active
-                       {% endif %}"
-            >
+                       {% endif %}">
                 <i class="ph-fill ph-broadcast text-xl"></i>
 
                 <span>
@@ -180,14 +171,11 @@
 
         <div class="mt-auto pt-5">
 
-            <a
-                href="/auth/logout"
-                class="sidebar-link
+            <a href="/auth/logout" class="sidebar-link
                        rounded-lg
                        px-3 py-2.5
                        flex items-center gap-3
-                       font-bold"
-            >
+                       font-bold">
                 <i class="ph-bold ph-sign-out text-xl"></i>
 
                 <span>
@@ -202,25 +190,19 @@
 
     <!-- MOBILE HEADER -->
 
-    <header
-        class="lg:hidden
-               px-5 pt-5"
-    >
+    <header class="lg:hidden
+               px-5 pt-5">
 
-        <div
-            class="retro-card rounded-xl
+        <div class="retro-card rounded-xl
                    px-4 py-3
-                   flex items-center justify-between"
-        >
+                   flex items-center justify-between">
 
             <a href="/" class="flex items-center gap-3">
 
-                <div
-                    class="logo-box
+                <div class="logo-box
                            w-11 h-11
                            rounded-lg
-                           flex items-center justify-center"
-                >
+                           flex items-center justify-center">
                     <i class="ph-fill ph-fish-simple
                               text-2xl text-orange-600"></i>
                 </div>
@@ -231,13 +213,10 @@
 
             </a>
 
-            <a
-                href="{{ url_for('dashboard.beacons') }}"
-                class="retro-btn
+            <a href="{{ url_for('dashboard.beacons') }}" class="retro-btn
                        rounded-lg
                        p-2
-                       flex items-center justify-center"
-            >
+                       flex items-center justify-center">
                 <i class="ph-fill ph-broadcast text-xl"></i>
             </a>
 
@@ -253,20 +232,15 @@
 
         <!-- PAGE HEADER -->
 
-        <header
-            class="mx-5 mt-5 lg:mx-8 lg:mt-8
+        <header class="mx-5 mt-5 lg:mx-8 lg:mt-8
                    flex items-center justify-between
-                   gap-4"
-        >
+                   gap-4">
 
             <div class="min-w-0">
 
                 <h1 class="text-2xl sm:text-3xl font-black">
                     {% block navbar_title %}{% endblock %}
                 </h1>
-
-                {% block navbar_subtitle %}{% endblock %}
-
             </div>
 
             <div class="flex items-center gap-3 shrink-0">
@@ -290,4 +264,5 @@
     {% block scripts %}{% endblock %}
 
 </body>
+
 </html>

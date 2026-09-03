@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import create_engine, String, DateTime, Boolean, JSON
+from sqlalchemy import create_engine, String, DateTime, Boolean, JSON, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
 engine = create_engine("sqlite:///c2.db")
@@ -36,6 +36,34 @@ class Challenge(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime)
 
     used: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id: Mapped[str] = mapped_column(
+        String, primary_key=True, default=lambda: str(uuid4())
+    )
+
+    beacon_id: Mapped[str | None] = mapped_column(
+        ForeignKey("beacons.id"), nullable=True
+    )
+
+    is_global: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    name: Mapped[str] = mapped_column(String)
+
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    task_type: Mapped[str] = mapped_column(String)
+
+    parameters: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    status: Mapped[str] = mapped_column(String, default="pending")
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
 Base.metadata.create_all(engine)
