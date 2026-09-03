@@ -1,0 +1,33 @@
+{% if beacons %}
+
+    {% for beacon in beacons %}
+
+        <div class="beacon">
+
+            <a href="{{ url_for('dashboard.beacon_details', beacon_id=beacon.id) }}">
+                {{ beacon.id }}
+            </a>
+
+            {% if beacon.status == "online" %}
+                <span>🟢 Online</span>
+            {% else %}
+                <span>⚫ Offline</span>
+            {% endif %}
+
+            <span>
+                Last active: {{ beacon.last_active }}
+            </span>
+
+            <a href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}">
+                Edit
+            </a>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No beacons registered.</p>
+
+{% endif %}

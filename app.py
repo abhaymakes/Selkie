@@ -4,9 +4,11 @@ from dashboard import dashboard
 app = Flask(__name__)
 app.register_blueprint(dashboard)
 
-@app.route('/', methods=['get', 'post'])
+
+@app.route("/", methods=["get", "post"])
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template("dashboard.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template
 
+from db_manager import get_session, Beacon
+
 dashboard = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
@@ -10,8 +12,31 @@ def index():
 
 @dashboard.route("/beacons")
 def beacons():
-    return "All Beacons"
+    with get_session() as session:
+        beacons = (
+            session.query(Beacon)
+            .order_by(
+                Beacon.status.desc(),
+                Beacon.last_active.desc()
+            )
+            .all()
+        )
 
+    return render_template("beacons.html", beacons=beacons)
+
+@dashboard.route("/beacons/status")
+def beacon_status():
+    with get_session() as session:
+        beacons = (
+            session.query(Beacon)
+            .order_by(
+                Beacon.status.desc(),
+                Beacon.last_active.desc()
+            )
+            .all()
+        )
+
+    return render_template("partials/beacon_list.html", beacons=beacons)
 
 @dashboard.route("/beacons/<beacon_id>")
 def beacon_details(beacon_id):
