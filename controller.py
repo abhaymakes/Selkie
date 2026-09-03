@@ -12,6 +12,9 @@ import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+import time
+import threading
+
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
@@ -194,6 +197,34 @@ def heartbeat():
             print("nope")
             return {"error": "Invalid signature"}
 
+
+def check_beacon_status():
+    while True:
+        now = datetime.now()
+
+        with get_session() as session:
+            beacons = session.query(Beacon).all()
+
+            for beacon in beacons:
+                if beacon.last_active is None:
+                    beacon.status = "offline"
+                    continue
+
+                elapsed = (now - beacon.last_active).total_seconds()
+
+                if elapsed > 30:
+                    beacon.status = "offline"
+
+            session.commit()
+
+        time.sleep(5)
+
+status_thread = threading.Thread(
+    target=check_beacon_status,
+    daemon=True
+)
+
+status_thread.start()
 
 if __name__ == "__main__":
     app.run(debug=True, port=4999)
