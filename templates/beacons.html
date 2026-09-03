@@ -1,27 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Beacons</title>
+    <title>Selkie • Beacons</title>
 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@2.0.6"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            background: #171614;
+            background-image: radial-gradient(circle at 1px 1px,
+                    #353129 1px,
+                    transparent 0);
+            background-size: 24px 24px;
+            font-family: "Trebuchet MS", sans-serif;
+            color: #eee7d8;
+        }
+
+        .retro-card {
+            background: #211f1b;
+            border: 2px solid #4b463c;
+            box-shadow: 5px 5px 0 #080808;
+        }
+
+        .retro-btn {
+            background: #f4c842;
+            color: #201f1b;
+            border: 2px solid #c9bfa9;
+            box-shadow: 3px 3px 0 #080808;
+            transition: .12s;
+        }
+
+        .retro-btn:hover {
+            background: #ffd95a;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #080808;
+        }
+
+        .logo-box {
+            background: #f4c842;
+            border: 2px solid #c9bfa9;
+            box-shadow: 5px 5px 0 #090909;
+        }
+
+        .nav-item {
+            transition: .12s;
+        }
+
+        .nav-item:hover {
+            background: #28251f;
+            border-color: #665e4f;
+            transform: translateX(2px);
+        }
+
+        .nav-active {
+            background: #2b2821;
+            border-color: #c9bfa9;
+        }
+
+        .stat {
+            background: #24221e;
+            border: 2px solid #4b463c;
+        }
+    </style>
 </head>
 
-<body>
 
-    <h1>Beacons</h1>
+<body class="min-h-screen w-full">
 
-    <div
-        id="beacon-list"
-        hx-get="{{ url_for('dashboard.beacon_status') }}"
-        hx-trigger="load, every 5s"
-        hx-target="#beacon-list"
-        hx-swap="innerHTML"
-    >
-        {% include "partials/beacon_list.html" %}
+    <div class="min-h-screen w-full p-5 md:p-8">
+
+        <!-- HEADER -->
+
+        <!-- NAVBAR -->
+
+        <header class="retro-card rounded-xl px-5 py-4 mb-6
+               flex items-center justify-between">
+
+            <!-- BRAND -->
+
+            <div class="flex items-center gap-4">
+
+                <div class="logo-box inline-flex items-center justify-center
+                    w-14 h-14 rounded-xl shrink-0">
+
+                    <i class="ph-fill ph-fish-simple
+                      text-3xl text-orange-600"></i>
+
+                </div>
+
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight">
+                        Selkie
+                    </h1>
+
+                    <p class="text-sm text-[#9d988d]">
+                        Beacon management
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- LOGOUT -->
+
+            <a href="/auth/logout" class="retro-btn rounded-lg px-4 py-2
+               font-bold flex items-center gap-2">
+
+                <i class="ph-bold ph-sign-out text-lg"></i>
+
+                <span class="hidden sm:inline">
+                    Logout
+                </span>
+
+            </a>
+        </header>
+
+        <!-- MAIN -->
+
+        <div class="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)]
+                    gap-6">
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="retro-card rounded-xl p-4 h-fit">
+
+                <div class="text-xs font-bold uppercase
+                            tracking-wider text-[#716c63]
+                            px-3 mb-3">
+                    Navigation
+                </div>
+
+
+                <nav>
+
+                    <a href="{{ url_for('dashboard.beacons') }}" class="nav-item nav-active
+                               flex items-center gap-3
+                               border-2 rounded-lg
+                               px-3 py-3 font-bold">
+
+                        <i class="ph-fill ph-broadcast text-xl
+                                  text-yellow-400"></i>
+
+                        Beacons
+
+                    </a>
+
+                </nav>
+
+            </aside>
+
+
+            <!-- CONTENT -->
+
+            <main class="min-w-0">
+
+
+                <!-- PAGE HEADER -->
+
+                <section class="retro-card rounded-xl p-5 mb-6">
+
+                    <div class="flex flex-col md:flex-row
+                                md:items-center md:justify-between
+                                gap-5">
+
+                        <div>
+
+                            <h2 class="text-2xl font-black
+                                       flex items-center gap-2">
+
+                                <i class="ph-fill ph-broadcast
+                                          text-yellow-400"></i>
+
+                                Beacons
+
+                            </h2>
+
+                            <p class="text-sm text-[#9d988d] mt-1">
+                                Registered security research agents
+                            </p>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <div class="stat rounded-lg px-4 py-2">
+
+                                <div class="text-xs font-bold
+                                            uppercase text-[#8f897e]">
+                                    Online
+                                </div>
+
+                                <div class="text-xl font-black
+                                            text-green-400">
+
+                                    {{ beacons
+                                    | selectattr("status", "equalto", "online")
+                                    | list
+                                    | length }}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="stat rounded-lg px-4 py-2">
+
+                                <div class="text-xs font-bold
+                                            uppercase text-[#8f897e]">
+                                    Offline
+                                </div>
+
+                                <div class="text-xl font-black
+                                            text-red-400">
+
+                                    {{ beacons
+                                    | selectattr("status", "equalto", "offline")
+                                    | list
+                                    | length }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- BEACONS -->
+
+                <div id="beacon-list" hx-get="{{ url_for('dashboard.beacon_status') }}" hx-trigger="every 5s"
+                    hx-swap="innerHTML">
+
+                    {% include "partials/beacon_list.html" %}
+
+                </div>
+
+
+            </main>
+
+        </div>
+
     </div>
 
 </body>
+
 </html>

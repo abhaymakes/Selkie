@@ -1,33 +1,148 @@
-{% if beacons %}
+<div class="space-y-4">
 
     {% for beacon in beacons %}
 
-        <div class="beacon">
+    <div class="retro-card rounded-xl p-5
+                transition duration-100
+                hover:bg-[#28251f]">
 
-            <a href="{{ url_for('dashboard.beacon_details', beacon_id=beacon.id) }}">
-                {{ beacon.id }}
-            </a>
+        <div class="flex flex-col md:flex-row
+                    md:items-center md:justify-between
+                    gap-5">
 
-            {% if beacon.status == "online" %}
-                <span>🟢 Online</span>
-            {% else %}
-                <span>⚫ Offline</span>
-            {% endif %}
 
-            <span>
-                Last active: {{ beacon.last_active }}
-            </span>
+            <!-- BEACON -->
 
-            <a href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}">
-                Edit
-            </a>
+            <div class="min-w-0">
+
+                <div class="flex items-center gap-3 mb-3">
+
+                    {% if beacon.status == "online" %}
+
+                        <span
+                            class="w-3.5 h-3.5 rounded-full
+                                   bg-green-400 border-2 border-[#6fa879]"
+                        ></span>
+
+                        <span class="font-black text-green-400">
+                            ONLINE
+                        </span>
+
+                    {% else %}
+
+                        <span
+                            class="w-3.5 h-3.5 rounded-full
+                                   bg-red-400 border-2 border-[#a85f5f]"
+                        ></span>
+
+                        <span class="font-black text-red-400">
+                            OFFLINE
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div
+                    class="font-black text-lg
+                           text-[#eee7d8]
+                           break-all"
+                >
+                    {{ beacon.id }}
+                </div>
+
+
+                <div
+                    class="mt-2 text-sm text-[#9d988d]
+                           flex items-center gap-2"
+                >
+
+                    <i class="ph-bold ph-clock"></i>
+
+                    <span>
+
+                        {% if beacon.last_active %}
+
+                            Last active:
+                            {{ beacon.last_active.strftime("%d %b %Y, %H:%M:%S") }}
+
+                        {% else %}
+
+                            Last active: Never
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="flex gap-3 shrink-0">
+
+                <a
+                    href="{{ url_for('dashboard.beacon_details', beacon_id=beacon.id) }}"
+                    class="retro-btn bg-green-400
+                           rounded-lg px-4 py-2
+                           font-bold
+                           flex items-center gap-2"
+                >
+
+                    <i class="ph-fill ph-eye"></i>
+
+                    View
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}"
+                    class="retro-btn bg-yellow-400
+                           rounded-lg px-4 py-2
+                           font-bold
+                           flex items-center gap-2"
+                >
+
+                    <i class="ph-fill ph-pencil-simple"></i>
+
+                    Edit
+
+                </a>
+
+            </div>
 
         </div>
 
+    </div>
+
+
+    {% else %}
+
+
+    <!-- EMPTY -->
+
+    <div class="retro-card rounded-xl p-10 text-center">
+
+        <i
+            class="ph-fill ph-broadcast
+                   text-5xl text-[#716c63]"
+        ></i>
+
+        <h3 class="text-xl font-black mt-4">
+            No beacons
+        </h3>
+
+        <p class="text-[#8f897e] mt-1">
+            No registered beacons were found.
+        </p>
+
+    </div>
+
+
     {% endfor %}
 
-{% else %}
-
-    <p>No beacons registered.</p>
-
-{% endif %}
+</div>

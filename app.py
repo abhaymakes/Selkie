@@ -7,7 +7,7 @@ app.register_blueprint(dashboard)
 
 @app.route("/", methods=["get", "post"])
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("home.html")
 
 
 if __name__ == "__main__":

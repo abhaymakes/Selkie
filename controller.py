@@ -199,7 +199,10 @@ def heartbeat():
 
 
 def check_beacon_status():
+    BEACON_TIMEOUT = 10
     while True:
+        print("Checking beacon status...")
+
         now = datetime.now()
 
         with get_session() as session:
@@ -212,19 +215,20 @@ def check_beacon_status():
 
                 elapsed = (now - beacon.last_active).total_seconds()
 
-                if elapsed > 30:
+                print(beacon.id, beacon.last_active, elapsed)
+
+                if elapsed > BEACON_TIMEOUT:
                     beacon.status = "offline"
+                    print(f"Beacon {beacon.id} marked OFFLINE")
 
             session.commit()
 
         time.sleep(5)
 
-status_thread = threading.Thread(
-    target=check_beacon_status,
-    daemon=True
-)
+
+status_thread = threading.Thread(target=check_beacon_status, daemon=True)
 
 status_thread.start()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=4999)
+    app.run(debug=False, port=4999)

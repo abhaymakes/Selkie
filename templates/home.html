@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Selkie</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            background: #171614;
+
+            background-image: radial-gradient(circle at 1px 1px,
+                    #353129 1px,
+                    transparent 0);
+
+            background-size: 24px 24px;
+
+            font-family: "Trebuchet MS", sans-serif;
+            color: #eee7d8;
+        }
+
+        .retro-btn {
+            background: #f4c842;
+            color: #201f1b;
+
+            border: 2px solid #c9bfa9;
+
+            box-shadow: 4px 4px 0 #090909;
+
+            transition: .12s;
+        }
+
+        .retro-btn:hover {
+            background: #ffd95a;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #090909;
+        }
+
+        .source-btn {
+            background: #211f1b;
+            color: #eee7d8;
+
+            border: 2px solid #4b463c;
+
+            box-shadow: 4px 4px 0 #080808;
+
+            transition: .12s;
+        }
+
+        .source-btn:hover {
+            background: #28251f;
+            border-color: #665e4f;
+
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #080808;
+        }
+
+        .logo-box {
+            background: #f4c842;
+
+            border: 2px solid #c9bfa9;
+
+            box-shadow: 5px 5px 0 #090909;
+        }
+    </style>
+</head>
+
+
+<body class="min-h-screen w-full">
+
+
+    <main class="min-h-screen w-full flex items-center justify-center px-6 py-12">
+
+        <div class="w-full max-w-3xl text-center">
+
+
+            <!-- LOGO -->
+
+            <div class="logo-box inline-flex items-center justify-center
+                        w-20 h-20 rounded-2xl mb-6">
+
+                <i class="ph-fill ph-fish-simple
+                          text-5xl text-orange-600"></i>
+
+            </div>
+
+
+            <!-- NAME -->
+
+            <h1 class="text-6xl sm:text-7xl font-black tracking-tight">
+                Selkie
+            </h1>
+
+
+            <!-- DESCRIPTION -->
+
+            <p class="text-lg sm:text-xl font-bold
+                      text-[#e5dece] mt-5">
+                A small C2 server for security labs.
+            </p>
+
+
+            <!-- ACTIONS -->
+
+            <div class="flex flex-col sm:flex-row
+                        items-center justify-center
+                        gap-4 mt-8">
+
+
+                <!-- SOURCE -->
+
+                <a href="https://github.com/abhaymakes/selkie" target="_blank" rel="noopener noreferrer"
+                    class="source-btn rounded-lg px-6 py-3
+                           inline-flex items-center
+                           justify-center gap-2
+                           font-bold">
+
+                    <i class="ph-fill ph-github-logo text-xl"></i>
+
+                    Source Code
+
+                </a>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="mt-14 text-sm text-[#716c63]">
+
+                © 2026 Selkie
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>
