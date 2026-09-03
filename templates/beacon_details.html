@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Selkie • Beacon</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            background: #171614;
+            background-image: radial-gradient(
+                circle at 1px 1px,
+                #353129 1px,
+                transparent 0
+            );
+            background-size: 24px 24px;
+
+            font-family: "Trebuchet MS", sans-serif;
+            color: #eee7d8;
+        }
+
+        .retro-card {
+            background: #211f1b;
+            border: 2px solid #4b463c;
+            box-shadow: 5px 5px 0 #080808;
+        }
+
+        .retro-btn {
+            background: #f4c842;
+            color: #201f1b;
+
+            border: 2px solid #c9bfa9;
+            box-shadow: 3px 3px 0 #080808;
+
+            transition: .12s;
+        }
+
+        .retro-btn:hover {
+            background: #ffd95a;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #080808;
+        }
+
+        .secondary-btn {
+            background: #24221e;
+            color: #eee7d8;
+
+            border: 2px solid #4b463c;
+            box-shadow: 3px 3px 0 #080808;
+
+            transition: .12s;
+        }
+
+        .secondary-btn:hover {
+            background: #2b2822;
+            border-color: #665e4f;
+
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #080808;
+        }
+
+        .info-row {
+            background: #24221e;
+            border: 2px solid #3d3932;
+        }
+
+        .section-title {
+            color: #eee7d8;
+        }
+
+        .muted {
+            color: #9d988d;
+        }
+
+        .mono {
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+
+<body class="min-h-screen w-full">
+
+    <div class="min-h-screen w-full p-5 md:p-8">
+
+
+        <!-- NAVBAR -->
+
+        <header class="retro-card rounded-xl px-5 py-4 mb-6
+                       flex items-center justify-between">
+
+            <div class="flex items-center gap-4">
+
+                <div class="inline-flex items-center justify-center
+                            w-14 h-14 rounded-xl
+                            bg-[#f4c842]
+                            border-2 border-[#c9bfa9]
+                            shadow-[5px_5px_0_#090909]
+                            shrink-0">
+
+                    <i class="ph-fill ph-fish-simple
+                              text-3xl text-orange-600"></i>
+
+                </div>
+
+                <div>
+
+                    <h1 class="text-2xl font-black tracking-tight">
+                        Selkie
+                    </h1>
+
+                    <p class="text-sm muted">
+                        Beacon details
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="/auth/logout"
+                class="retro-btn rounded-lg px-4 py-2
+                       font-bold flex items-center gap-2"
+            >
+
+                <i class="ph-bold ph-sign-out text-lg"></i>
+
+                <span class="hidden sm:inline">
+                    Logout
+                </span>
+
+            </a>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <main class="max-w-6xl mx-auto">
+
+
+            <!-- PAGE HEADER -->
+
+            <section class="retro-card rounded-xl p-5 mb-6">
+
+                <div class="flex flex-col md:flex-row
+                            md:items-center
+                            md:justify-between gap-5">
+
+                    <div class="min-w-0">
+
+                        <div class="flex items-center gap-3 mb-3">
+
+                            {% if beacon.status == "online" %}
+
+                                <span
+                                    class="w-3.5 h-3.5 rounded-full
+                                           bg-green-400
+                                           border-2 border-[#6fa879]"
+                                ></span>
+
+                                <span class="font-black text-green-400">
+                                    ONLINE
+                                </span>
+
+                            {% else %}
+
+                                <span
+                                    class="w-3.5 h-3.5 rounded-full
+                                           bg-red-400
+                                           border-2 border-[#a85f5f]"
+                                ></span>
+
+                                <span class="font-black text-red-400">
+                                    OFFLINE
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <h2 class="text-2xl sm:text-3xl
+                                   font-black break-all mono">
+
+                            {{ beacon.id }}
+
+                        </h2>
+
+                        <p class="text-sm muted mt-2">
+                            Beacon identity and system information
+                        </p>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="flex gap-3 shrink-0">
+
+                        <a
+                            href="{{ url_for('dashboard.beacons') }}"
+                            class="secondary-btn rounded-lg px-4 py-2
+                                   font-bold flex items-center gap-2"
+                        >
+
+                            <i class="ph-bold ph-arrow-left"></i>
+
+                            Back
+
+                        </a>
+
+
+                        <a
+                            href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}"
+                            class="retro-btn rounded-lg px-4 py-2
+                                   font-bold flex items-center gap-2"
+                        >
+
+                            <i class="ph-fill ph-pencil-simple"></i>
+
+                            Edit
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- OVERVIEW -->
+
+            <section class="mb-6">
+
+                <div class="flex items-center gap-3 mb-3">
+
+                    <i class="ph-fill ph-info
+                              text-xl text-yellow-400"></i>
+
+                    <h3 class="section-title text-xl font-black">
+                        Overview
+                    </h3>
+
+                </div>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2
+                            xl:grid-cols-3 gap-4">
+
+
+                    <!-- STATUS -->
+
+                    <div class="info-row rounded-xl p-4">
+
+                        <div class="text-xs font-bold uppercase
+                                    tracking-wide muted">
+                            Status
+                        </div>
+
+                        <div class="mt-2 font-black">
+
+                            {% if beacon.status == "online" %}
+
+                                <span class="text-green-400">
+                                    Online
+                                </span>
+
+                            {% else %}
+
+                                <span class="text-red-400">
+                                    Offline
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LAST ACTIVE -->
+
+                    <div class="info-row rounded-xl p-4">
+
+                        <div class="text-xs font-bold uppercase
+                                    tracking-wide muted">
+                            Last Active
+                        </div>
+
+                        <div class="mt-2 font-black">
+
+                            {% if beacon.last_active %}
+
+                                {{ beacon.last_active.strftime(
+                                    "%d %b %Y, %H:%M:%S"
+                                ) }}
+
+                            {% else %}
+
+                                <span class="muted">
+                                    Never
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BEACON ID -->
+
+                    <div class="info-row rounded-xl p-4
+                                md:col-span-2 xl:col-span-1">
+
+                        <div class="text-xs font-bold uppercase
+                                    tracking-wide muted">
+                            Beacon ID
+                        </div>
+
+                        <div class="mt-2 font-black mono
+                                    text-sm break-all">
+
+                            {{ beacon.id }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- IDENTITY -->
+
+            <section class="retro-card rounded-xl p-5 mb-6">
+
+                <div class="flex items-center gap-3 mb-5">
+
+                    <i class="ph-fill ph-shield-check
+                              text-2xl text-green-400"></i>
+
+                    <div>
+
+                        <h3 class="text-xl font-black">
+                            Cryptographic Identity
+                        </h3>
+
+                        <p class="text-sm muted">
+                            Public identity associated with this beacon
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-row rounded-xl p-4">
+
+                    <div class="text-xs font-bold uppercase
+                                tracking-wide muted mb-2">
+
+                        Public Key
+
+                    </div>
+
+                    <div class="mono text-sm break-all
+                                text-[#cfc7b7] leading-relaxed">
+
+                        {% if beacon.public_key %}
+
+                            {{ beacon.public_key }}
+
+                        {% else %}
+
+                            <span class="muted">
+                                No public key available
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SYSTEM INFORMATION -->
+
+            <section class="retro-card rounded-xl p-5">
+
+                <div class="flex items-center gap-3 mb-5">
+
+                    <i class="ph-fill ph-desktop
+                              text-2xl text-blue-400"></i>
+
+                    <div>
+
+                        <h3 class="text-xl font-black">
+                            System Information
+                        </h3>
+
+                        <p class="text-sm muted">
+                            Information reported during registration
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% if system_info %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-2
+                                gap-3">
+
+                        {% for key, value in system_info.items() %}
+
+                            <div class="info-row rounded-xl p-4">
+
+                                <div class="text-xs font-bold
+                                            uppercase tracking-wide
+                                            muted mb-2">
+
+                                    {{ key | replace("_", " ") }}
+
+                                </div>
+
+                                <div class="font-bold break-words">
+
+                                    {{ value }}
+
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="info-row rounded-xl p-6 text-center">
+
+                        <i class="ph-fill ph-desktop
+                                  text-3xl text-[#716c63]"></i>
+
+                        <p class="font-bold mt-3">
+                            No system information available
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ class Beacon(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
     public_key: Mapped[str] = mapped_column(String)
-    system_info: Mapped[str] = mapped_column(String)
+    system_info: Mapped[str] = mapped_column(JSON)
     registered_at: Mapped[datetime] = mapped_column(DateTime)
     last_active: Mapped[datetime] = mapped_column(DateTime)
     status: Mapped[str] = mapped_column(String, default="offline")
