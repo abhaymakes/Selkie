@@ -231,44 +231,50 @@ class Beacon:
     def update_task_status(self, task_id, status, result=None, error=None):
         payload = {"task_id": task_id, "beacon_id": self.beacon_id, "status": status}
 
+        SET_TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/set"
+
         if result is not None:
             payload["result"] = result
 
         if error is not None:
             payload["error"] = error
 
-        response = self.http.request(
+        response = urllib3.request(
             "POST",
-            f"{self.server_url}/tasks/set",
+            SET_TASK_URL,
             body=json.dumps(payload),
             headers={"Content-Type": "application/json"},
         )
 
         return response
 
+
     def fetch_one_task(self):
         while True:
 
             if self.is_executing_task:
+                time.sleep(1)
                 continue
 
             TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/{self.beacon_id}"
-            first_task = urllib3.request("GET", TASK_URL).json()
 
-            if first_task["task"] is not None:
+            try:
+                response = urllib3.request("GET", TASK_URL)
+                first_task = response.json()
 
-                task_id = first_task["task"]["id"]
-                self.is_executing_task = True
+                if first_task.get("task") is not None:
 
-                self.set_task_status(
-                    task_id,
-                    beacon_id=self.beacon_id,
-                    status="running",
-                    started_at=self.now,
-                    assigned_at=self.now(),
-                )
+                    task = first_task["task"]
+                    task_id = task["id"]
 
-                print(f"Started executing {first_task}")
+                    self.is_executing_task = True
+
+                    self.update_task_status(task_id, status="running")
+
+                    print(f"Started executing {task}")
+
+            except Exception as e:
+                print(f"Task polling error: {e}")
 
             time.sleep(5)
 

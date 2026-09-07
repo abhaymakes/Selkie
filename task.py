@@ -1,10 +1,19 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
-from db_manager import get_session, Beacon, Task
+from db_manager import get_session, Beacon, Task, TaskExecution
 from sqlalchemy import or_
+
 import json
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 task = Blueprint("task", __name__, url_prefix="/task")
+
+
+# ============================================================
+# CREATE TASK
+# ============================================================
 
 
 @task.route("/create", methods=["POST"])
@@ -60,18 +69,9 @@ def create_task():
     return redirect(url_for("task.view_tasks", beacon_id=beacon_id))
 
 
-@task.route("/<beacon_id>/<task_id>/delete", methods=["POST"])
-def delete_task(beacon_id, task_id):
-    with get_session() as session:
-        task_to_delete = session.query(Task).filter_by(id=task_id).first()
-
-        if not task_to_delete:
-            return "Task not found", 404
-
-        session.delete(task_to_delete)
-        session.commit()
-
-    return redirect(url_for("task.view_tasks", beacon_id=beacon_id))
+# ============================================================
+# VIEW TASKS
+# ============================================================
 
 
 @task.route("/tasks/<beacon_id>", methods=["GET"])
@@ -86,23 +86,26 @@ def view_tasks(beacon_id):
 
         tasks = (
             session.query(Task)
-            .join(Beacon, isouter=True)
             .filter(or_(Task.beacon_id == beacon_id, Task.is_global.is_(True)))
+            .order_by(Task.created_at.asc())
             .all()
         )
 
     return render_template("tasks.html", beacon=beacon, tasks=tasks)
 
 
+# ============================================================
+# GET ONE TASK FOR BEACON
+# ============================================================
+
+
 @task.route("/tasks/get/<beacon_id>", methods=["GET"])
 def get_task(beacon_id):
     with get_session() as session:
+
         task = (
             session.query(Task)
-            .filter(
-                Task.status == "pending",
-                or_(Task.beacon_id == beacon_id, Task.is_global.is_(True)),
-            )
+            .filter(or_(Task.beacon_id == beacon_id, Task.is_global.is_(True)))
             .order_by(Task.created_at.asc())
             .first()
         )
@@ -124,6 +127,70 @@ def get_task(beacon_id):
         )
 
 
+# ============================================================
+# TASK EXECUTION STATUS
+# ============================================================
+
+
+def set_task_status(task_id, beacon_id, status, assigned_at=None, started_at=None):
+    with get_session() as session:
+
+        execution = (
+            session.query(TaskExecution)
+            .filter_by(task_id=task_id, beacon_id=beacon_id)
+            .first()
+        )
+
+        if not execution:
+            return False
+
+        execution.status = status
+
+        if assigned_at is not None:
+            execution.assigned_at = assigned_at
+
+        if started_at is not None:
+            execution.started_at = started_at
+
+        session.commit()
+
+        return True
+
+
+# ============================================================
+# TASK EXECUTION RESULT
+# ============================================================
+
+
+def set_task_result(
+    task_id, beacon_id, status, result=None, error=None, completed_at=None
+):
+    with get_session() as session:
+
+        execution = (
+            session.query(TaskExecution)
+            .filter_by(task_id=task_id, beacon_id=beacon_id)
+            .first()
+        )
+
+        if not execution:
+            return False
+
+        execution.status = status
+        execution.result = result
+        execution.error = error
+        execution.completed_at = completed_at
+
+        session.commit()
+
+        return True
+
+
+# ============================================================
+# SET TASK EXECUTION STATUS / RESULT
+# ============================================================
+
+
 @task.route("/tasks/set", methods=["POST"])
 def set_task():
     data = request.get_json()
@@ -140,24 +207,25 @@ def set_task():
     if status not in allowed_statuses:
         return jsonify({"error": "Invalid task status"}), 400
 
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Asia/Kolkata"))
 
     try:
+
         if status == "assigned":
 
-            db_manager.set_task_status(
+            success = set_task_status(
                 task_id=task_id, beacon_id=beacon_id, status="assigned", assigned_at=now
             )
 
         elif status == "running":
 
-            db_manager.set_task_status(
+            success = set_task_status(
                 task_id=task_id, beacon_id=beacon_id, status="running", started_at=now
             )
 
         elif status == "completed":
 
-            db_manager.set_task_result(
+            success = set_task_result(
                 task_id=task_id,
                 beacon_id=beacon_id,
                 status="completed",
@@ -167,13 +235,16 @@ def set_task():
 
         elif status == "failed":
 
-            db_manager.set_task_result(
+            success = set_task_result(
                 task_id=task_id,
                 beacon_id=beacon_id,
                 status="failed",
                 error=data.get("error"),
                 completed_at=now,
             )
+
+        if not success:
+            return jsonify({"error": "Task execution not found"}), 404
 
         return (
             jsonify(
@@ -188,4 +259,29 @@ def set_task():
         )
 
     except Exception as e:
+
+        print("ERROR IN /tasks/set:")
+        print(type(e).__name__)
+        print(str(e))
+
         return jsonify({"error": str(e)}), 500
+
+
+# ============================================================
+# DELETE TASK
+# ============================================================
+
+
+@task.route("/<beacon_id>/<task_id>/delete", methods=["POST"])
+def delete_task(beacon_id, task_id):
+    with get_session() as session:
+
+        task_to_delete = session.query(Task).filter_by(id=task_id).first()
+
+        if not task_to_delete:
+            return "Task not found", 404
+
+        session.delete(task_to_delete)
+        session.commit()
+
+    return redirect(url_for("task.view_tasks", beacon_id=beacon_id))
