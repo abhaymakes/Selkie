@@ -19,44 +19,36 @@
 
                     {% if beacon.status == "online" %}
 
-                        <span
-                            class="w-3.5 h-3.5 rounded-full
-                                   bg-green-400 border-2 border-[#6fa879]"
-                        ></span>
+                    <span class="w-3.5 h-3.5 rounded-full
+                                   bg-green-400 border-2 border-[#6fa879]"></span>
 
-                        <span class="font-black text-green-400">
-                            ONLINE
-                        </span>
+                    <span class="font-black text-green-400">
+                        ONLINE
+                    </span>
 
                     {% else %}
 
-                        <span
-                            class="w-3.5 h-3.5 rounded-full
-                                   bg-red-400 border-2 border-[#a85f5f]"
-                        ></span>
+                    <span class="w-3.5 h-3.5 rounded-full
+                                   bg-red-400 border-2 border-[#a85f5f]"></span>
 
-                        <span class="font-black text-red-400">
-                            OFFLINE
-                        </span>
+                    <span class="font-black text-red-400">
+                        OFFLINE
+                    </span>
 
                     {% endif %}
 
                 </div>
 
 
-                <div
-                    class="font-black text-lg
+                <div class="font-black text-lg
                            text-[#eee7d8]
-                           break-all"
-                >
+                           break-all">
                     {{ beacon.id }}
                 </div>
 
 
-                <div
-                    class="mt-2 text-sm text-[#9d988d]
-                           flex items-center gap-2"
-                >
+                <div class="mt-2 text-sm text-[#9d988d]
+                           flex items-center gap-2">
 
                     <i class="ph-bold ph-clock"></i>
 
@@ -64,12 +56,12 @@
 
                         {% if beacon.last_active %}
 
-                            Last active:
-                            {{ beacon.last_active.strftime("%d %b %Y, %H:%M:%S") }}
+                        Last active:
+                        {{ beacon.last_active.strftime("%d %b %Y, %H:%M:%S") }}
 
                         {% else %}
 
-                            Last active: Never
+                        Last active: Never
 
                         {% endif %}
 
@@ -84,28 +76,27 @@
 
             <div class="flex gap-3 shrink-0">
 
-                <a
-                    href="{{ url_for('dashboard.beacon_details', beacon_id=beacon.id) }}"
-                    class="retro-btn bg-green-400
+                <a href="{{ url_for('dashboard.beacon_details', beacon_id=beacon.id) }}" class="retro-btn bg-green-400
                            rounded-lg px-4 py-2
                            font-bold
-                           flex items-center gap-2"
-                >
+                           flex items-center gap-2">
 
                     <i class="ph-fill ph-eye"></i>
 
                     View
 
                 </a>
+                <a href="{{ url_for('task.view_tasks', beacon_id=beacon.id) }}" class="secondary-btn rounded-lg px-3 py-2
+           flex items-center justify-center gap-2
+           text-sm font-bold">
+                    <i class="ph-fill ph-list-checks"></i>
+                    Tasks
+                </a>
 
-
-                <a
-                    href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}"
-                    class="retro-btn bg-yellow-400
+                <a href="{{ url_for('dashboard.edit_beacon', beacon_id=beacon.id) }}" class="retro-btn bg-yellow-400
                            rounded-lg px-4 py-2
                            font-bold
-                           flex items-center gap-2"
-                >
+                           flex items-center gap-2">
 
                     <i class="ph-fill ph-pencil-simple"></i>
 
@@ -127,10 +118,8 @@
 
     <div class="retro-card rounded-xl p-10 text-center">
 
-        <i
-            class="ph-fill ph-broadcast
-                   text-5xl text-[#716c63]"
-        ></i>
+        <i class="ph-fill ph-broadcast
+                   text-5xl text-[#716c63]"></i>
 
         <h3 class="text-xl font-black mt-4">
             No beacons
