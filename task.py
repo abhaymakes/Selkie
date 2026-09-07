@@ -92,3 +92,33 @@ def view_tasks(beacon_id):
         )
 
     return render_template("tasks.html", beacon=beacon, tasks=tasks)
+
+
+@task.route("/tasks/get/<beacon_id>", methods=["GET"])
+def get_task(beacon_id):
+    with get_session() as session:
+        task = (
+            session.query(Task)
+            .filter(
+                Task.status == "pending",
+                or_(Task.beacon_id == beacon_id, Task.is_global.is_(True)),
+            )
+            .order_by(Task.created_at.asc())
+            .first()
+        )
+
+        if not task:
+            return jsonify({"task": None}), 200
+
+        return (
+            jsonify(
+                {
+                    "task": {
+                        "id": task.id,
+                        "task": task.task_type,
+                        "args": task.parameters or {},
+                    }
+                }
+            ),
+            200,
+        )

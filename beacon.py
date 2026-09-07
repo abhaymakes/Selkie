@@ -17,9 +17,12 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 class Beacon:
 
     BASE_SERVER_URL = "http://127.0.0.1:4999"
+    BASE_API_SERVER_URL = "http://127.0.0.1:5001"
 
     def __init__(self):
         self.description = "Hello, I am a Beacon."
+
+        self.is_executing_task = False
 
         if self.identity_exists():
             identity = self.load_beacon_identity()
@@ -111,7 +114,9 @@ class Beacon:
 
         if req.status == 200 and req.json()["verified"]:
             print("Beacon authentication successful.")
+            # Start threaded functions
             self.start_heartbeat()
+            self.start_fetching_tasks()
             return True
 
         print("Beacon authentication failed:", req.data)
@@ -170,8 +175,12 @@ class Beacon:
 
         if req.status == 200 and req.json()["verified"]:
             print("Beacon registered successfully.")
+
+            # Start threaded functions
+
             self.store_beacon_identity()
             self.start_heartbeat()
+            self.start_fetching_tasks()
             return True
 
         if req.status == 409:
@@ -214,6 +223,35 @@ class Beacon:
 
     def start_heartbeat(self):
         t1 = Thread(target=self.heartbeat)
+        t1.start()
+
+    def set_task_status(self, task_id, beacon_id, status):
+        pass
+
+    def fetch_one_task(self):
+        while True:
+
+            if self.is_executing_task:
+                continue
+
+            TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/{self.beacon_id}"
+            first_task = urllib3.request(
+                "GET", TASK_URL
+            ).json
+
+            if first_task['task'] != "null":
+
+                task_id = first_task['task']["id"]
+                self.is_executing_task = True
+
+                self.set_task_status(task_id, beacon_id=self.beacon_id, status="running")
+
+
+            print(first_task.data)
+            time.sleep(5)
+
+    def start_fetching_tasks(self):
+        t1 = Thread(target=self.fetch_one_task)
         t1.start()
 
 

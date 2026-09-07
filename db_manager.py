@@ -66,6 +66,30 @@ class Task(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class TaskExecution(Base):
+    __tablename__ = "task_executions"
+
+    id: Mapped[str] = mapped_column(
+        String, primary_key=True, default=lambda: str(uuid4())
+    )
+
+    task_id: Mapped[str] = mapped_column(ForeignKey("tasks.id"), nullable=False)
+
+    beacon_id: Mapped[str] = mapped_column(ForeignKey("beacons.id"), nullable=False)
+
+    status: Mapped[str] = mapped_column(String, default="pending")
+
+    assigned_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    error: Mapped[str | None] = mapped_column(String, nullable=True)
+
+
 Base.metadata.create_all(engine)
 
 
