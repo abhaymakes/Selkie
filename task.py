@@ -123,6 +123,7 @@ def get_task(beacon_id):
             200,
         )
 
+
 @task.route("/tasks/set", methods=["POST"])
 def set_task():
     data = request.get_json()
@@ -132,62 +133,59 @@ def set_task():
     status = data.get("status")
 
     if not task_id or not beacon_id or not status:
-        return jsonify({
-            "error": "task_id, beacon_id and status are required"
-        }), 400
+        return jsonify({"error": "task_id, beacon_id and status are required"}), 400
 
-    if status not in ["assigned", "running", "completed", "failed"]:
-        return jsonify({
-            "error": "Invalid task status"
-        }), 400
+    allowed_statuses = {"assigned", "running", "completed", "failed"}
+
+    if status not in allowed_statuses:
+        return jsonify({"error": "Invalid task status"}), 400
 
     now = datetime.now()
 
     try:
-        # Status update
         if status == "assigned":
+
             db_manager.set_task_status(
-                task_id=task_id,
-                beacon_id=beacon_id,
-                status=status,
-                assigned_at=now
+                task_id=task_id, beacon_id=beacon_id, status="assigned", assigned_at=now
             )
 
         elif status == "running":
+
             db_manager.set_task_status(
-                task_id=task_id,
-                beacon_id=beacon_id,
-                status=status,
-                started_at=now
+                task_id=task_id, beacon_id=beacon_id, status="running", started_at=now
             )
 
-        # Final result
         elif status == "completed":
+
             db_manager.set_task_result(
                 task_id=task_id,
                 beacon_id=beacon_id,
-                status=status,
+                status="completed",
                 result=data.get("result"),
-                completed_at=now
+                completed_at=now,
             )
 
         elif status == "failed":
+
             db_manager.set_task_result(
                 task_id=task_id,
                 beacon_id=beacon_id,
-                status=status,
+                status="failed",
                 error=data.get("error"),
-                completed_at=now
+                completed_at=now,
             )
 
-        return jsonify({
-            "success": True,
-            "task_id": task_id,
-            "beacon_id": beacon_id,
-            "status": status
-        }), 200
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "task_id": task_id,
+                    "beacon_id": beacon_id,
+                    "status": status,
+                }
+            ),
+            200,
+        )
 
     except Exception as e:
-        return jsonify({
-            "error": str(e)
-        }), 500
+        return jsonify({"error": str(e)}), 500
