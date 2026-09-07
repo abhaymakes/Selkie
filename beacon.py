@@ -205,6 +205,9 @@ class Beacon:
             "message": message,
         }
 
+    def now(self):
+        return str(datetime.now(ZoneInfo("Asia/Kolkata")))
+
     def heartbeat(self):
         while True:
             message = self.generate_signed_ping_signature()
@@ -225,7 +228,7 @@ class Beacon:
         t1 = Thread(target=self.heartbeat)
         t1.start()
 
-    def set_task_status(self, task_id, beacon_id, status):
+    def set_task_status(self, task_id, beacon_id, status, started_at=None, assigned_at=None):
         pass
 
     def fetch_one_task(self):
@@ -235,16 +238,22 @@ class Beacon:
                 continue
 
             TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/{self.beacon_id}"
-            first_task = urllib3.request(
-                "GET", TASK_URL
-            ).json()
+            first_task = urllib3.request("GET", TASK_URL).json()
 
-            if first_task['task'] is not None:
+            if first_task["task"] is not None:
 
-                task_id = first_task['task']["id"]
+                task_id = first_task["task"]["id"]
                 self.is_executing_task = True
 
-                self.set_task_status(task_id, beacon_id=self.beacon_id, status="running")
+                self.set_task_status(
+                    task_id,
+                    beacon_id=self.beacon_id,
+                    status="running",
+                    started_at=self.now,
+                    assigned_at=self.now(),
+                )
+
+                print(f"Started executing {first_task}")
 
             time.sleep(5)
 
