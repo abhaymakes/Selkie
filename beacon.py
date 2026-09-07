@@ -228,8 +228,23 @@ class Beacon:
         t1 = Thread(target=self.heartbeat)
         t1.start()
 
-    def set_task_status(self, task_id, beacon_id, status, started_at=None, assigned_at=None):
-        pass
+    def update_task_status(self, task_id, status, result=None, error=None):
+        payload = {"task_id": task_id, "beacon_id": self.beacon_id, "status": status}
+
+        if result is not None:
+            payload["result"] = result
+
+        if error is not None:
+            payload["error"] = error
+
+        response = self.http.request(
+            "POST",
+            f"{self.server_url}/tasks/set",
+            body=json.dumps(payload),
+            headers={"Content-Type": "application/json"},
+        )
+
+        return response
 
     def fetch_one_task(self):
         while True:
