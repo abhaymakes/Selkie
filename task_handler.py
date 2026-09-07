@@ -3,11 +3,18 @@ import subprocess
 
 class TaskHandler:
 
-    def execute_command(self, command):
+    def execute_command(self, args):
+        command = args.get("command")
+
+        if not command:
+            raise ValueError("No command provided")
 
         try:
             result = subprocess.run(
-                command.split(), capture_output=True, text=True, timeout=10
+                command.split(),
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
 
             if result.returncode != 0:
@@ -24,10 +31,16 @@ class TaskHandler:
             }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "error": "Command timed out"}
+            return {
+                "success": False,
+                "error": "Command timed out",
+            }
 
         except Exception as e:
-            return {"success": False, "error": str(e)}
+            return {
+                "success": False,
+                "error": str(e),
+            }
 
     def execute(self, task):
         task_type = task.get("task")
