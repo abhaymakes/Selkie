@@ -18,7 +18,6 @@ def create_task():
 
     is_global = request_data.get("is_global") == "on"
 
-    # Convert parameters textarea from JSON string → dict
     parameters_raw = request_data.get("parameters", "").strip()
 
     if parameters_raw:
@@ -54,6 +53,9 @@ def create_task():
 
         session.add(new_task)
         session.commit()
+
+    if is_global:
+        return redirect("/dashboard/beacons")
 
     return redirect(url_for("task.view_tasks", beacon_id=beacon_id))
 

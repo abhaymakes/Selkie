@@ -220,7 +220,7 @@ Tasks
 
                 <label class="relative inline-flex items-center cursor-pointer">
 
-                    <input id="is_global" name="is_global" type="checkbox" value="true" class="sr-only peer">
+                    <input id="is_global" name="is_global" type="checkbox" class="sr-only peer">
 
                     <div class="w-11 h-6
                                bg-[#3d3932]
@@ -376,18 +376,12 @@ Tasks
 
 
                     <!-- DELETE -->
-<form
-    method="POST"
-    action="{{ url_for(
+                    <form method="POST" action="{{ url_for(
         'task.delete_task',
         beacon_id=beacon.id,
         task_id=task.id
-    ) }}"
-    class="inline-block"
->
-    <button
-        type="submit"
-        class="rounded-lg
+    ) }}" class="inline-block">
+                        <button type="submit" class="rounded-lg
                border-2 border-red-900
                bg-red-950
                px-3 py-2
@@ -400,12 +394,11 @@ Tasks
                hover:text-red-100
                hover:translate-x-[2px]
                hover:translate-y-[2px]
-               hover:shadow-[1px_1px_0_#080808]"
-    >
-        <i class="ph-bold ph-trash text-base"></i>
-        Delete
-    </button>
-</form>
+               hover:shadow-[1px_1px_0_#080808]">
+                            <i class="ph-bold ph-trash text-base"></i>
+                            Delete
+                        </button>
+                    </form>
 
                 </div>
 
