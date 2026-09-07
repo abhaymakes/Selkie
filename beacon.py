@@ -237,17 +237,15 @@ class Beacon:
             TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/{self.beacon_id}"
             first_task = urllib3.request(
                 "GET", TASK_URL
-            ).json
+            ).json()
 
-            if first_task['task'] != "null":
+            if first_task['task'] is not None:
 
                 task_id = first_task['task']["id"]
                 self.is_executing_task = True
 
                 self.set_task_status(task_id, beacon_id=self.beacon_id, status="running")
 
-
-            print(first_task.data)
             time.sleep(5)
 
     def start_fetching_tasks(self):
