@@ -229,7 +229,11 @@ class Beacon:
         t1.start()
 
     def update_task_status(self, task_id, status, result=None, error=None):
-        payload = {"task_id": task_id, "beacon_id": self.beacon_id, "status": status}
+        payload = {
+            "task_id": task_id,
+            "beacon_id": self.beacon_id,
+            "status": status,
+        }
 
         SET_TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/set"
 
@@ -248,7 +252,6 @@ class Beacon:
 
         return response
 
-
     def fetch_one_task(self):
         while True:
 
@@ -256,15 +259,15 @@ class Beacon:
                 time.sleep(1)
                 continue
 
-            TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/{self.beacon_id}"
+            TASK_URL = f"{self.BASE_API_SERVER_URL}/task/tasks/get/" f"{self.beacon_id}"
 
             try:
                 response = urllib3.request("GET", TASK_URL)
-                first_task = response.json()
+                data = response.json()
 
-                if first_task.get("task") is not None:
+                if data.get("task") is not None:
 
-                    task = first_task["task"]
+                    task = data["task"]
                     task_id = task["id"]
 
                     self.is_executing_task = True
@@ -272,6 +275,20 @@ class Beacon:
                     self.update_task_status(task_id, status="running")
 
                     print(f"Started executing {task}")
+
+                    try:
+                        result = self.task_manager.execute(task)
+
+                        self.update_task_status(
+                            task_id, status="completed", result=result
+                        )
+
+                    except Exception as e:
+
+                        self.update_task_status(task_id, status="failed", error=str(e))
+
+                    finally:
+                        self.is_executing_task = False
 
             except Exception as e:
                 print(f"Task polling error: {e}")
