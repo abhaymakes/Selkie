@@ -60,11 +60,18 @@ class TaskHandler:
 
         return self.run_command(command=command)
 
+
     def upload_file(self, args):
         file_path = args.get("file_path")
 
         if not file_path:
             raise ValueError("No file path provided.")
+
+        curl = "curl.exe" if platform.system() == "Windows" else "curl"
+
+        result = self.run_command(f'{curl} -s -F "file=@{file_path}" https://qurl.sh')
+
+        return result
 
     def write_file(self, args):
         pass
