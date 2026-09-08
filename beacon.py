@@ -3,6 +3,7 @@ import os
 import urllib3
 import base64
 import json
+import platform
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -14,6 +15,7 @@ from threading import Thread
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from task_handler import task_manager
+
 
 class Beacon:
 
@@ -124,7 +126,11 @@ class Beacon:
         return False
 
     def generate_beacon_fingerprint(self):
-        os_info = os.uname()
+        try:
+            os_info = os.uname()
+        except AttributeError:
+            os_info = platform.uname()
+
         os_cpu_count = os.cpu_count()
         os_user = os.environ.get("USER") or os.environ.get("USERNAME")
 
