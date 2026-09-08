@@ -395,7 +395,13 @@ Tasks
                                 RESULT
                             </div>
 
-                            <pre class="text-xs whitespace-pre-wrap overflow-x-auto">{{ task.execution.result }}</pre>
+                            {% if task.execution.result.output %}
+                            <pre
+                                class="text-xs whitespace-pre-wrap overflow-x-auto">{{ task.execution.result.output }}</pre>
+                            {% else %}
+                            <pre
+                                class="text-xs whitespace-pre-wrap overflow-x-auto">{{ task.execution.result | tojson(indent=2) }}</pre>
+                            {% endif %}
 
                         </div>
 
