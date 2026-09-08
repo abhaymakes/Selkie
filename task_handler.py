@@ -11,9 +11,10 @@ class TaskHandler:
 
         try:
             result = subprocess.run(
-                command.split(),
+                command,
                 capture_output=True,
                 text=True,
+                shell=True,
                 timeout=10,
             )
 
@@ -90,6 +91,7 @@ class TaskHandler:
 
         handlers = {
             "command_execution": self.execute_command,
+            "list_directory": self.list_directory,
         }
 
         handler = handlers.get(task_type)
