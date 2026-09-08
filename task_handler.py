@@ -42,6 +42,15 @@ class TaskHandler:
                 "error": str(e),
             }
 
+    def list_directory(self, args):
+        pass
+
+    def upload_file(self, args):
+        pass
+
+    def write_file(self, args):
+        pass
+
     def execute(self, task):
         task_type = task.get("task")
         args = task.get("args", {})

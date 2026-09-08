@@ -231,4 +231,4 @@ status_thread = threading.Thread(target=check_beacon_status, daemon=True)
 status_thread.start()
 
 if __name__ == "__main__":
-    app.run(debug=False, port=4999)
+    app.run(debug=False, port=4999, host="0.0.0.0")
