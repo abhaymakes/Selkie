@@ -304,32 +304,30 @@ Tasks
                                    md:items-center
                                    md:justify-between
                                    gap-4">
-
                     <div class="min-w-0">
 
-                        <div class="flex flex-wrap
-                                           items-center gap-2 mb-2">
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
 
                             <h3 class="font-black text-lg">
                                 {{ task.name }}
                             </h3>
 
                             <span class="text-xs font-bold
-                                               px-2 py-1
-                                               rounded-md
-                                               bg-[#2b2822]
-                                               border border-[#4b463c]
-                                               text-[#b8b1a3]">
+                     px-2 py-1
+                     rounded-md
+                     bg-[#2b2822]
+                     border border-[#4b463c]
+                     text-[#b8b1a3]">
                                 {{ task.task_type }}
                             </span>
 
                             {% if task.is_global %}
 
                             <span class="text-xs font-bold
-                                                   px-2 py-1
-                                                   rounded-md
-                                                   bg-yellow-400
-                                                   text-[#201f1b]">
+                     px-2 py-1
+                     rounded-md
+                     bg-yellow-400
+                     text-[#201f1b]">
                                 GLOBAL
                             </span>
 
@@ -347,15 +345,13 @@ Tasks
                         {% endif %}
 
 
-                        <div class="flex flex-wrap
-                                           items-center gap-x-5
-                                           gap-y-1
-                                           text-xs muted">
+                        <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs muted">
 
                             <span>
                                 Status:
+
                                 <strong class="text-[#eee7d8]">
-                                    {{ task.status }}
+                                    {{ task.execution.status }}
                                 </strong>
                             </span>
 
@@ -363,14 +359,64 @@ Tasks
 
                             <span>
                                 Created:
-                                {{ task.created_at.strftime(
-                                "%d %b %Y, %H:%M:%S"
-                                ) }}
+                                {{ task.created_at.strftime("%d %b %Y, %H:%M:%S") }}
+                            </span>
+
+                            {% endif %}
+
+                            {% if task.execution.started_at %}
+
+                            <span>
+                                Started:
+                                {{ task.execution.started_at.strftime("%d %b %Y, %H:%M:%S") }}
+                            </span>
+
+                            {% endif %}
+
+                            {% if task.execution.completed_at %}
+
+                            <span>
+                                Completed:
+                                {{ task.execution.completed_at.strftime("%d %b %Y, %H:%M:%S") }}
                             </span>
 
                             {% endif %}
 
                         </div>
+
+
+                        {% if task.execution.status == "completed" and task.execution.result %}
+
+                        <div class="mt-3 p-3 rounded-md
+                bg-[#201f1b]
+                border border-[#4b463c]">
+
+                            <div class="text-xs font-bold muted mb-1">
+                                RESULT
+                            </div>
+
+                            <pre class="text-xs whitespace-pre-wrap overflow-x-auto">{{ task.execution.result }}</pre>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if task.execution.status == "failed" and task.execution.error %}
+
+                        <div class="mt-3 p-3 rounded-md
+                bg-[#2b201e]
+                border border-red-900">
+
+                            <div class="text-xs font-bold text-red-400 mb-1">
+                                ERROR
+                            </div>
+
+                            <pre class="text-xs whitespace-pre-wrap overflow-x-auto">{{ task.execution.error }}</pre>
+
+                        </div>
+
+                        {% endif %}
 
                     </div>
 
