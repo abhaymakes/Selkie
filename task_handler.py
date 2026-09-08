@@ -56,3 +56,5 @@ class TaskHandler:
             raise ValueError(f"Unknown task type: {task_type}")
 
         return handler(args)
+
+task_manager = TaskHandler()
