@@ -43,7 +43,40 @@ class TaskHandler:
             }
 
     def list_directory(self, args):
-        pass
+        directory = args.get("directory", ".")
+
+        try:
+            result = subprocess.run(
+                ['ls', directory],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+
+            if result.returncode != 0:
+                return {
+                    "success": False,
+                    "error": result.stderr.strip(),
+                    "returncode": result.returncode,
+                }
+
+            return {
+                "success": True,
+                "output": result.stdout,
+                "returncode": result.returncode,
+            }
+
+        except subprocess.TimeoutExpired:
+            return {
+                "success": False,
+                "error": "Command timed out",
+            }
+
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+            }
 
     def upload_file(self, args):
         pass
@@ -65,5 +98,6 @@ class TaskHandler:
             raise ValueError(f"Unknown task type: {task_type}")
 
         return handler(args)
+
 
 task_manager = TaskHandler()
