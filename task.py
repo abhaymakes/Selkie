@@ -79,6 +79,7 @@ def view_tasks(beacon_id):
     """View and manage tasks of a beacon."""
 
     with get_session() as session:
+
         beacon = session.query(Beacon).filter_by(id=beacon_id).first()
 
         if not beacon:
@@ -91,7 +92,37 @@ def view_tasks(beacon_id):
             .all()
         )
 
-    return render_template("tasks.html", beacon=beacon, tasks=tasks)
+        task_data = []
+
+        for task_item in tasks:
+
+            execution = (
+                session.query(TaskExecution)
+                .filter_by(task_id=task_item.id, beacon_id=beacon_id)
+                .first()
+            )
+
+            task_data.append(
+                {
+                    "id": task_item.id,
+                    "name": task_item.name,
+                    "description": task_item.description,
+                    "task_type": task_item.task_type,
+                    "parameters": task_item.parameters or {},
+                    "is_global": task_item.is_global,
+                    "created_at": task_item.created_at,
+                    "execution": {
+                        "status": execution.status if execution else "pending",
+                        "assigned_at": execution.assigned_at if execution else None,
+                        "started_at": execution.started_at if execution else None,
+                        "completed_at": execution.completed_at if execution else None,
+                        "result": execution.result if execution else None,
+                        "error": execution.error if execution else None,
+                    },
+                }
+            )
+
+    return render_template("tasks.html", beacon=beacon, tasks=task_data)
 
 
 # ============================================================
