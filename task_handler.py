@@ -1,14 +1,10 @@
 import subprocess
+import platform
 
 
 class TaskHandler:
 
-    def execute_command(self, args):
-        command = args.get("command")
-
-        if not command:
-            raise ValueError("No command provided")
-
+    def run_command(self, command):
         try:
             result = subprocess.run(
                 command,
@@ -43,44 +39,32 @@ class TaskHandler:
                 "error": str(e),
             }
 
+    def execute_command(self, args):
+        command = args.get("command")
+
+        if not command:
+            raise ValueError("No command provided")
+
+        return self.run_command(command=command)
+
     def list_directory(self, args):
         directory = args.get("directory", ".")
 
-        try:
-            result = subprocess.run(
-                ['ls', directory],
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
+        os = platform.system().lower()
 
-            if result.returncode != 0:
-                return {
-                    "success": False,
-                    "error": result.stderr.strip(),
-                    "returncode": result.returncode,
-                }
+        if os == "windows":
+            command = ["dir", directory]
 
-            return {
-                "success": True,
-                "output": result.stdout,
-                "returncode": result.returncode,
-            }
+        elif os == "linux":
+            command = ["ls", directory]
 
-        except subprocess.TimeoutExpired:
-            return {
-                "success": False,
-                "error": "Command timed out",
-            }
-
-        except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-            }
+        return self.run_command(command=command)
 
     def upload_file(self, args):
-        pass
+        file_path = args.get("file_path")
+
+        if not file_path:
+            raise ValueError("No file path provided.")
 
     def write_file(self, args):
         pass

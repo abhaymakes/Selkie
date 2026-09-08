@@ -113,24 +113,25 @@ Tasks
 
         <form method="POST" action="{{ url_for('task.create_task') }}" class="space-y-4">
 
+            <input type="hidden" name="beacon_id" value="{{ beacon.id }}">
+
             <!-- NAME + TYPE -->
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 <div>
-                    <input type="hidden" name="beacon_id" value="{{ beacon.id }}">
 
                     <label for="name" class="block text-sm font-bold mb-2">
                         Name
                     </label>
 
                     <input id="name" name="name" type="text" required placeholder="Task name" class="w-full rounded-lg
-                               bg-[#24221e]
-                               border-2 border-[#3d3932]
-                               px-3 py-2.5
-                               text-[#eee7d8]
-                               outline-none
-                               focus:border-[#c9bfa9]">
+                          bg-[#24221e]
+                          border-2 border-[#3d3932]
+                          px-3 py-2.5
+                          text-[#eee7d8]
+                          outline-none
+                          focus:border-[#c9bfa9]">
 
                 </div>
 
@@ -141,13 +142,25 @@ Tasks
                         Task Type
                     </label>
 
-                    <input id="task_type" name="task_type" type="text" required placeholder="Task type" class="w-full rounded-lg
-                               bg-[#24221e]
-                               border-2 border-[#3d3932]
-                               px-3 py-2.5
-                               text-[#eee7d8]
-                               outline-none
-                               focus:border-[#c9bfa9]">
+                    <select id="task_type" name="task_type" required class="w-full rounded-lg
+                           bg-[#24221e]
+                           border-2 border-[#3d3932]
+                           px-3 py-2.5
+                           text-[#eee7d8]
+                           outline-none
+                           focus:border-[#c9bfa9]">
+
+                        <option value="">Select task type</option>
+
+                        <option value="command_execution">
+                            Command Execution
+                        </option>
+
+                        <option value="list_directory">
+                            List Directory
+                        </option>
+
+                    </select>
 
                 </div>
 
@@ -163,38 +176,35 @@ Tasks
                 </label>
 
                 <textarea id="description" name="description" rows="3" placeholder="Optional description" class="w-full rounded-lg
-                           bg-[#24221e]
-                           border-2 border-[#3d3932]
-                           px-3 py-2.5
-                           text-[#eee7d8]
-                           outline-none
-                           resize-y
-                           focus:border-[#c9bfa9]"></textarea>
+                         bg-[#24221e]
+                         border-2 border-[#3d3932]
+                         px-3 py-2.5
+                         text-[#eee7d8]
+                         outline-none
+                         resize-y
+                         focus:border-[#c9bfa9]"></textarea>
 
             </div>
 
 
-            <!-- PARAMETERS -->
+            <!-- TASK ARGUMENTS -->
 
             <div>
 
-                <label for="parameters" class="block text-sm font-bold mb-2">
-                    Parameters
+                <label class="block text-sm font-bold mb-2">
+                    Arguments
                 </label>
 
-                <textarea id="parameters" name="parameters" rows="5" placeholder='{"key": "value"}' class="w-full rounded-lg
-                           bg-[#24221e]
-                           border-2 border-[#3d3932]
-                           px-3 py-2.5
-                           text-[#eee7d8]
-                           mono text-sm
-                           outline-none
-                           resize-y
-                           focus:border-[#c9bfa9]"></textarea>
+                <div id="task-arguments" class="space-y-3">
 
-                <p class="text-xs muted mt-2">
-                    Optional JSON parameters for the task.
-                </p>
+                    <p class="text-xs muted">
+                        Select a task type to configure its arguments.
+                    </p>
+
+                </div>
+
+                <!-- Hidden field actually submitted to Flask -->
+                <input type="hidden" id="parameters" name="parameters">
 
             </div>
 
@@ -202,9 +212,9 @@ Tasks
             <!-- GLOBAL -->
 
             <div class="flex items-center justify-between
-                       gap-4
-                       pt-4
-                       border-t border-[#3d3932]">
+                gap-4
+                pt-4
+                border-t border-[#3d3932]">
 
                 <div>
 
@@ -223,22 +233,23 @@ Tasks
                     <input id="is_global" name="is_global" type="checkbox" class="sr-only peer">
 
                     <div class="w-11 h-6
-                               bg-[#3d3932]
-                               rounded-full
-                               peer-checked:bg-[#f4c842]
-                               after:content-['']
-                               after:absolute
-                               after:top-[2px]
-                               after:left-[2px]
-                               after:w-5
-                               after:h-5
-                               after:bg-[#eee7d8]
-                               after:border-[#665e4f]
-                               after:border
-                               after:rounded-full
-                               after:transition-all
-                               peer-checked:after:translate-x-full
-                               peer-checked:after:border-[#c9bfa9]"></div>
+                        bg-[#3d3932]
+                        rounded-full
+                        peer-checked:bg-[#f4c842]
+                        after:content-['']
+                        after:absolute
+                        after:top-[2px]
+                        after:left-[2px]
+                        after:w-5
+                        after:h-5
+                        after:bg-[#eee7d8]
+                        after:border-[#665e4f]
+                        after:border
+                        after:rounded-full
+                        after:transition-all
+                        peer-checked:after:translate-x-full
+                        peer-checked:after:border-[#c9bfa9]">
+                    </div>
 
                 </label>
 
@@ -250,9 +261,9 @@ Tasks
             <div class="flex justify-end pt-2">
 
                 <button type="submit" class="retro-btn rounded-lg
-                           px-5 py-2.5
-                           font-black
-                           flex items-center gap-2">
+                       px-5 py-2.5
+                       font-black
+                       flex items-center gap-2">
 
                     <i class="ph-fill ph-plus"></i>
 
@@ -482,5 +493,120 @@ Tasks
     </section>
 
 </div>
+
+<script>
+
+    const TASK_DEFINITIONS = {
+
+        command_execution: {
+            label: "Command Execution",
+
+            fields: {
+                command: {
+                    label: "Command",
+                    type: "text",
+                    placeholder: "Enter command"
+                }
+            }
+        },
+
+        list_directory: {
+            label: "List Directory",
+
+            fields: {
+                directory: {
+                    label: "Directory",
+                    type: "text",
+                    placeholder: "C:\\Users"
+                }
+            }
+        }
+
+    };
+
+
+    const taskType = document.getElementById("task_type");
+    const taskArguments = document.getElementById("task-arguments");
+    const parameters = document.getElementById("parameters");
+
+
+    function renderTaskArguments() {
+
+        const type = taskType.value;
+        const definition = TASK_DEFINITIONS[type];
+
+        taskArguments.innerHTML = "";
+
+        if (!definition) {
+
+            taskArguments.innerHTML = `
+            <p class="text-xs muted">
+                Select a task type to configure its arguments.
+            </p>
+        `;
+
+            parameters.value = "";
+            return;
+        }
+
+
+        Object.entries(definition.fields).forEach(
+            ([name, field]) => {
+
+                const wrapper = document.createElement("div");
+
+                wrapper.innerHTML = `
+                <label class="block text-sm font-bold mb-2">
+                    ${field.label}
+                </label>
+
+                <input
+                    type="${field.type}"
+                    data-task-argument="${name}"
+                    placeholder="${field.placeholder || ""}"
+                    class="w-full rounded-lg
+                           bg-[#24221e]
+                           border-2 border-[#3d3932]
+                           px-3 py-2.5
+                           text-[#eee7d8]
+                           outline-none
+                           focus:border-[#c9bfa9]"
+                >
+            `;
+
+                taskArguments.appendChild(wrapper);
+            }
+        );
+    }
+
+
+    function buildParameters() {
+
+        const args = {};
+
+        taskArguments
+            .querySelectorAll("[data-task-argument]")
+            .forEach(input => {
+
+                args[input.dataset.taskArgument] = input.value;
+
+            });
+
+        parameters.value = JSON.stringify(args);
+    }
+
+
+    taskType.addEventListener(
+        "change",
+        renderTaskArguments
+    );
+
+
+    document.querySelector("form").addEventListener(
+        "submit",
+        buildParameters
+    );
+
+</script>
 
 {% endblock %}
