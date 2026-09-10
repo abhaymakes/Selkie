@@ -1,5 +1,5 @@
 """
-Implementation of a C2 Server using Python.
+Implementation of a C2 Server using Python. I decided to call it "Selkie" because of the Irish folklore, they are shape-shifting creatures with the ability to turn into a human, similar to how a C2 beacon works, hiding itself and changing presence among the benign.
 """
 
 from flask import Flask, request

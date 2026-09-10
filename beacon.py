@@ -14,6 +14,8 @@ from threading import Thread
 # Encryption libraries to prevent Firewall and IDS Detection
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+""" Still need to implement encrypted communication between the beacon and server. """
+
 from task_handler import task_manager
 
 

